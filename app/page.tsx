@@ -6,6 +6,9 @@ import Advantages from "@/components/Advantages";
 import Collection from "@/components/Collection";
 import ReadyToWear from "@/components/ReadyToWear";
 import HowToOrder from "@/components/HowToOrder";
+import CTASection from "@/components/CTASection";
+import Faq from "@/components/FAQ";
+import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
@@ -18,6 +21,10 @@ export default function Home() {
       <Collection/>
       <ReadyToWear/>
       <HowToOrder/>
+      <CTASection/>
+      <Faq/>
+      <Footer/>
+
     </main>
   );
 }

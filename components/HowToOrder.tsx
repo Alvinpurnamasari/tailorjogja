@@ -1,115 +1,97 @@
 const steps = [
-    {
-      number: "01",
-      title: "Hubungi Kami",
-      description:
-        "Hubungi TailorJogja.com melalui WhatsApp dan sampaikan jenis pakaian yang ingin Anda buat.",
-    },
-    {
-      number: "02",
-      title: "Konsultasi",
-      description:
-        "Diskusikan kebutuhan, model, bahan, warna, serta detail pakaian yang Anda inginkan.",
-    },
-    {
-      number: "03",
-      title: "Pengukuran",
-      description:
-        "Penjahit melakukan pengukuran secara langsung agar pakaian dibuat sesuai dengan ukuran tubuh Anda.",
-    },
-    {
-      number: "04",
-      title: "Proses Pengerjaan",
-      description:
-        "Pakaian mulai dikerjakan dengan memperhatikan ukuran, detail, dan hasil jahitan.",
-    },
-    {
-      number: "05",
-      title: "Pakaian Siap",
-      description:
-        "Setelah selesai, pakaian siap digunakan dengan ukuran dan detail yang telah disesuaikan.",
-    },
-  ];
-  
-  export default function HowToOrder() {
-    const whatsappUrl =
-      "https://wa.me/6285701111308?text=Halo%20TailorJogja.com,%20saya%20ingin%20konsultasi%20pembuatan%20pakaian.";
-  
-    return (
-      <section
-        id="cara-pesan"
-        className="scroll-mt-[92px] bg-[#f5f1e8] px-6 py-24 md:px-10 lg:px-20 lg:py-32"
-      >
-        <div className="mx-auto max-w-[1480px]">
-  
-          {/* HEADER */}
-          <div className="grid gap-10 lg:grid-cols-2 lg:items-end">
-            <div>
-              <div className="mb-8 flex items-center gap-4">
-                <span className="h-px w-9 bg-[#c99036]" />
-                <p className="text-[11px] font-semibold tracking-[0.3em] text-[#c99036]">
-                  CARA PESAN
-                </p>
-              </div>
-  
-              <h2 className="font-serif text-[48px] leading-[0.98] text-[#15120f] md:text-[64px] lg:text-[76px]">
-                Mudah untuk Memulai
-                <br />
-                <span className="italic text-[#c99036]">
-                  Pakaian Anda
-                </span>
-              </h2>
-            </div>
-  
-            <div className="lg:pb-2 lg:pl-20">
-              <p className="max-w-[520px] text-[16px] leading-8 text-[#71675c]">
-                Mulai dari konsultasi hingga pakaian selesai, setiap proses
-                dilakukan dengan komunikasi yang jelas dan sesuai kebutuhan Anda.
-              </p>
-            </div>
+  {
+    number: "01",
+    title: "Konsultasi",
+    description:
+      "Hubungi kami melalui WhatsApp dan sampaikan pakaian yang ingin dibuat.",
+  },
+  {
+    number: "02",
+    title: "Pilih Model & Bahan",
+    description:
+      "Diskusikan model, bahan, warna, dan detail pakaian yang diinginkan.",
+  },
+  {
+    number: "03",
+    title: "Pengukuran",
+    description:
+      "Penjahit melakukan pengukuran badan secara langsung.",
+  },
+  {
+    number: "04",
+    title: "Proses Pengerjaan",
+    description:
+      "Pakaian dibuat berdasarkan ukuran dan detail yang telah disepakati.",
+  },
+  {
+    number: "05",
+    title: "Fitting & Selesai",
+    description:
+      "Pakaian dicoba untuk memastikan ukuran dan kenyamanannya.",
+  },
+];
+
+export default function HowToOrder() {
+  return (
+    <section
+      id="cara-pesan"
+      className="scroll-mt-[90px] bg-[#f8f5ef] text-[#100e0b]"
+    >
+      <div className="mx-auto max-w-[1500px] px-6 py-20 md:px-10 lg:px-16 lg:py-24">
+
+        {/* HEADER */}
+        <div className="text-center">
+          <div className="mb-7 flex items-center justify-center gap-4">
+            <span className="h-px w-8 bg-[#c98b28]" />
+
+            <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-[#c98b28]">
+              Simple Process
+            </span>
           </div>
-  
-          {/* STEPS */}
-          <div className="mt-20 grid border-l border-t border-[#d8d0c4] md:grid-cols-2 lg:grid-cols-5">
+
+          <h2 className="mx-auto max-w-[720px] font-serif text-[52px] leading-[1.08] sm:text-[60px] lg:text-[68px]">
+            Bagaimana
+            <br />
+            Cara Membuat
+            <br />
+            <span className="italic font-normal text-[#d6a247]">
+              Pakaian Custom?
+            </span>
+          </h2>
+        </div>
+
+        {/* STEPS */}
+        <div className="relative mt-20 lg:mt-24">
+
+          {/* GARIS HORIZONTAL */}
+          <div className="absolute left-0 right-0 top-[30px] hidden h-px bg-[#d8cfc0] lg:block" />
+
+          <div className="relative grid gap-12 md:grid-cols-2 lg:grid-cols-5 lg:gap-0">
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="group min-h-[330px] border-b border-r border-[#d8d0c4] p-8 transition duration-300 hover:bg-[#eee8dc] lg:p-9"
+                className="relative px-4 text-center lg:px-5"
               >
-                <span className="text-[12px] font-semibold tracking-[0.3em] text-[#c99036]">
+                {/* NUMBER */}
+                <div className="relative z-10 mx-auto flex h-[60px] w-[60px] items-center justify-center border border-[#d6a247] bg-[#f8f5ef] font-serif text-[14px] text-[#c98b28]">
                   {step.number}
-                </span>
-  
-                <div className="my-12 h-px w-10 bg-[#c99036] transition-all duration-300 group-hover:w-16" />
-  
-                <h3 className="font-serif text-[26px] leading-tight text-[#17130f]">
+                </div>
+
+                {/* TITLE */}
+                <h3 className="mt-7 font-serif text-[20px] leading-snug lg:text-[21px]">
                   {step.title}
                 </h3>
-  
-                <p className="mt-6 text-[14px] leading-7 text-[#71675c]">
+
+                {/* DESCRIPTION */}
+                <p className="mx-auto mt-4 max-w-[250px] text-[14px] leading-6 text-[#756554]">
                   {step.description}
                 </p>
               </div>
             ))}
           </div>
-  
-          {/* BOTTOM CTA */}
-          <div className="flex flex-col gap-8 border-b border-l border-r border-[#d8d0c4] px-8 py-10 md:flex-row md:items-center md:justify-between lg:px-10">
-            <p className="text-[11px] font-semibold tracking-[0.25em] text-[#71675c]">
-              MULAI KONSULTASI UNTUK PAKAIAN CUSTOM ANDA.
-            </p>
-  
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex min-w-[270px] items-center justify-between bg-[#0d0c0a] px-7 py-5 text-[11px] font-bold tracking-[0.13em] text-white transition hover:bg-[#c99036] hover:text-black"
-            >
-              KONSULTASI SEKARANG
-              <span className="text-lg">↗</span>
-            </a>
-          </div>
         </div>
-      </section>
-    );
-  }
+
+      </div>
+    </section>
+  );
+}
