@@ -1,37 +1,28 @@
-const steps = [
-  {
-    number: "01",
-    title: "Konsultasi",
-    description:
-      "Hubungi kami melalui WhatsApp dan sampaikan pakaian yang ingin dibuat.",
-  },
-  {
-    number: "02",
-    title: "Pilih Model & Bahan",
-    description:
-      "Diskusikan model, bahan, warna, dan detail pakaian yang diinginkan.",
-  },
-  {
-    number: "03",
-    title: "Pengukuran",
-    description:
-      "Penjahit melakukan pengukuran badan secara langsung.",
-  },
-  {
-    number: "04",
-    title: "Proses Pengerjaan",
-    description:
-      "Pakaian dibuat berdasarkan ukuran dan detail yang telah disepakati.",
-  },
-  {
-    number: "05",
-    title: "Fitting & Selesai",
-    description:
-      "Pakaian dicoba untuk memastikan ukuran dan kenyamanannya.",
-  },
-];
+import { createClient } from "@/utils/supabase/server";
 
-export default function HowToOrder() {
+export const dynamic = "force-dynamic";
+
+type OrderStep = {
+  id: number;
+  title: string;
+  description: string | null;
+  sort_order: number;
+};
+
+export default async function HowToOrder() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from("order_steps")
+    .select("id, title, description, sort_order")
+    .order("sort_order", { ascending: true });
+
+  const steps: OrderStep[] = data ?? [];
+
+  if (error) {
+    console.error("Gagal mengambil data Cara Pesan:", error.message);
+  }
+
   return (
     <section
       id="cara-pesan"
@@ -63,34 +54,52 @@ export default function HowToOrder() {
         {/* STEPS */}
         <div className="relative mt-20 lg:mt-24">
 
-          {/* GARIS HORIZONTAL */}
-          <div className="absolute left-0 right-0 top-[30px] hidden h-px bg-[#d8cfc0] lg:block" />
+          {/* AREA YANG BISA DIGESER */}
+          <div className="order-steps-scroll overflow-x-auto scroll-smooth pb-4">
 
-          <div className="relative grid gap-12 md:grid-cols-2 lg:grid-cols-5 lg:gap-0">
-            {steps.map((step) => (
-              <div
-                key={step.number}
-                className="relative px-4 text-center lg:px-5"
-              >
-                {/* NUMBER */}
-                <div className="relative z-10 mx-auto flex h-[60px] w-[60px] items-center justify-center border border-[#d6a247] bg-[#f8f5ef] font-serif text-[14px] text-[#c98b28]">
-                  {step.number}
+            {/* SEMUA STEP TETAP SATU BARIS */}
+            <div className="relative flex min-w-full">
+
+              {/* GARIS HORIZONTAL */}
+              {steps.length > 1 && (
+                <div className="absolute left-0 right-0 top-[30px] hidden h-px bg-[#d8cfc0] lg:block" />
+              )}
+
+              {steps.map((step, index) => (
+                <div
+                  key={step.id}
+                  className="relative w-[280px] shrink-0 px-4 text-center md:w-[300px] lg:w-[20%] lg:min-w-[20%] lg:px-5"
+                >
+                  {/* NUMBER */}
+                  <div className="relative z-10 mx-auto flex h-[60px] w-[60px] items-center justify-center border border-[#d6a247] bg-[#f8f5ef] font-serif text-[14px] text-[#c98b28]">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+
+                  {/* TITLE */}
+                  <h3 className="mt-7 font-serif text-[20px] leading-snug text-[#100e0b] lg:text-[21px]">
+                    {step.title}
+                  </h3>
+
+                  {/* DESCRIPTION */}
+                  {step.description && (
+                    <p className="mx-auto mt-4 max-w-[250px] text-[14px] leading-6 text-[#756554]">
+                      {step.description}
+                    </p>
+                  )}
                 </div>
+              ))}
 
-                {/* TITLE */}
-                <h3 className="mt-7 font-serif text-[20px] leading-snug lg:text-[21px]">
-                  {step.title}
-                </h3>
-
-                {/* DESCRIPTION */}
-                <p className="mx-auto mt-4 max-w-[250px] text-[14px] leading-6 text-[#756554]">
-                  {step.description}
-                </p>
-              </div>
-            ))}
+            </div>
           </div>
-        </div>
 
+          {/* JIKA BELUM ADA DATA */}
+          {steps.length === 0 && (
+            <p className="mt-10 text-center text-[14px] text-[#756554]">
+              Belum ada langkah pemesanan.
+            </p>
+          )}
+
+        </div>
       </div>
     </section>
   );

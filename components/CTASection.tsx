@@ -1,18 +1,58 @@
 import { MessageCircle } from "lucide-react";
+import { createClient } from "@/utils/supabase/server";
 
-export default function CTASection() {
-  const whatsappUrl =
-    "https://wa.me/6285701111308?text=Halo%20TailorJogja.com%2C%20saya%20ingin%20konsultasi%20pembuatan%20pakaian.";
+export const dynamic = "force-dynamic";
+
+export default async function CTASection() {
+  const supabase = await createClient();
+
+  const { data: cta, error: ctaError } = await supabase
+    .from("cta_section")
+    .select(
+      "badge, title, title_highlight, description, button_text, background_url"
+    )
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (ctaError) {
+    console.error("Gagal mengambil CTA:", ctaError.message);
+  }
+
+  const whatsappNumber = "6285701111308";
+
+  const message =
+    "Halo TailorJogja.com, saya ingin konsultasi pembuatan pakaian.";
+
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    message
+  )}`;
+
+  const badge = cta?.badge || "Your Perfect Fit Awaits";
+
+  const title =
+    cta?.title || "Saatnya Memiliki Pakaian yang Benar-Benar";
+
+  const titleHighlight =
+    cta?.title_highlight || "Pas Untuk Anda";
+
+  const description =
+    cta?.description ||
+    "Konsultasikan jas, vest, celana, atau kemeja custom Anda bersama TailorJogja.com.";
+
+  const buttonText =
+    cta?.button_text || "Konsultasi Gratis via WhatsApp";
+
+  const backgroundUrl =
+    cta?.background_url || "/images/cta-tailor.jpg";
 
   return (
-    <section
-      className="relative flex min-h-[610px] items-center justify-center overflow-hidden bg-black"
-    >
-      {/* BACKGROUND IMAGE */}
+    <section className="relative flex min-h-[610px] items-center justify-center overflow-hidden bg-black">
+      
+      {/* BACKGROUND */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/images/cta-tailor.jpg')",
+          backgroundImage: `url("${backgroundUrl}")`,
         }}
       />
 
@@ -22,21 +62,18 @@ export default function CTASection() {
       {/* CONTENT */}
       <div className="relative z-10 mx-auto max-w-[1100px] px-6 text-center text-white">
         <p className="mb-8 text-[11px] font-semibold uppercase tracking-[0.3em] text-[#f1e8dc]">
-          Your Perfect Fit Awaits
+          {badge}
         </p>
 
         <h2 className="font-serif text-[42px] leading-[1.18] sm:text-[52px] lg:text-[60px]">
-          Saatnya Memiliki Pakaian yang
-          <br />
-          Benar-Benar{" "}
+          {title}{" "}
           <span className="italic font-normal text-[#d6a247]">
-            Pas Untuk Anda
+            {titleHighlight}
           </span>
         </h2>
 
         <p className="mx-auto mt-8 max-w-[760px] text-[15px] leading-7 text-[#eee8df]">
-          Konsultasikan jas, vest, celana, atau kemeja custom Anda bersama
-          TailorJogja.com.
+          {description}
         </p>
 
         <a
@@ -46,7 +83,7 @@ export default function CTASection() {
           className="mt-10 inline-flex items-center justify-center gap-3 bg-[#d6a247] px-8 py-5 text-[12px] font-semibold uppercase tracking-[0.08em] text-black transition duration-300 hover:bg-[#e4b45c]"
         >
           <MessageCircle size={21} strokeWidth={1.7} />
-          Konsultasi Gratis via WhatsApp
+          {buttonText}
         </a>
       </div>
     </section>

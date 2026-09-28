@@ -1,65 +1,86 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 type CollectionItem = {
   id: number;
   category: string;
   title: string;
-  image: string;
+  description: string | null;
+  image_url: string | null;
+  sort_order: number | null;
 };
 
-const collections: CollectionItem[] = [
-  {
-    id: 1,
-    category: "JAS",
-    title: "Charcoal Business Suit",
-    image: "/images/jas.jpg",
-  },
-  {
-    id: 2,
-    category: "VEST",
-    title: "Classic Bronze Vest",
-    image: "/images/jas1.jpg",
-  },
-  {
-    id: 3,
-    category: "KEMEJA",
-    title: "Ivory Dress Shirt",
-    image: "/images/hero-tailor.jpg",
-  },
-  {
-    id: 4,
-    category: "CELANA",
-    title: "Tailored Formal Trousers",
-    image: "/images/hero-tailor.jpg",
-  },
-  {
-    id: 5,
-    category: "SETELAN",
-    title: "The Signature Set",
-    image: "/images/hero-tailor.jpg",
-  },
-  {
-    id: 6,
-    category: "JAS",
-    title: "Hand-finished Lapel",
-    image: "/images/hero-tailor.jpg",
-  },
-];
-
-const filters = ["SEMUA", "JAS", "VEST", "KEMEJA", "CELANA", "SETELAN"];
-
 export default function Collection() {
+  const supabase = useMemo(() => createClient(), []);
+
+  const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [activeFilter, setActiveFilter] = useState("SEMUA");
   const [selectedItem, setSelectedItem] =
     useState<CollectionItem | null>(null);
 
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // ==========================================
+  // AMBIL DATA COLLECTIONS DARI SUPABASE
+  // ==========================================
+  useEffect(() => {
+    async function getCollections() {
+      setLoading(true);
+      setErrorMessage("");
+
+      const { data, error } = await supabase
+        .from("collections")
+        .select(`
+          id,
+          category,
+          title,
+          description,
+          image_url,
+          sort_order
+        `)
+        .order("sort_order", { ascending: true })
+        .order("id", { ascending: true });
+
+      if (error) {
+        console.error("Gagal mengambil collections:", error);
+        setErrorMessage("Gagal memuat koleksi.");
+        setCollections([]);
+      } else {
+        setCollections(data || []);
+      }
+
+      setLoading(false);
+    }
+
+    getCollections();
+  }, [supabase]);
+
+  // ==========================================
+  // BUAT FILTER OTOMATIS DARI DATABASE
+  // ==========================================
+  const filters = [
+    "SEMUA",
+    ...Array.from(
+      new Set(
+        collections
+          .map((item) => item.category?.trim().toUpperCase())
+          .filter(Boolean)
+      )
+    ),
+  ];
+
+  // ==========================================
+  // FILTER COLLECTION
+  // ==========================================
   const filteredCollections =
     activeFilter === "SEMUA"
       ? collections
       : collections.filter(
-          (item) => item.category === activeFilter
+          (item) =>
+            item.category?.trim().toUpperCase() === activeFilter
         );
 
   return (
@@ -81,7 +102,6 @@ export default function Collection() {
             </div>
 
             <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-
               <div>
                 <h2 className="font-serif text-[48px] leading-[1] md:text-[65px] lg:text-[72px]">
                   Hasil Karya{" "}
@@ -96,64 +116,102 @@ export default function Collection() {
               </div>
 
               {/* FILTER */}
-              <div className="flex flex-nowrap items-center gap-2 lg:justify-end">
-                {filters.map((filter) => (
+              {!loading && collections.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 lg:justify-end">
+                  {filters.map((filter) => (
                     <button
-                    key={filter}
-                    onClick={() => setActiveFilter(filter)}
-                    className={`shrink-0 border-b px-4 py-3 text-[11px] font-semibold tracking-[0.08em] transition ${
+                      key={filter}
+                      type="button"
+                      onClick={() => setActiveFilter(filter)}
+                      className={`shrink-0 border-b px-4 py-3 text-[11px] font-semibold tracking-[0.08em] transition ${
                         activeFilter === filter
-                        ? "border-[#c99036] text-[#11100d]"
-                        : "border-[#d8d0c4] text-[#685f55] hover:border-[#c99036]"
-                    }`}
+                          ? "border-[#c99036] text-[#11100d]"
+                          : "border-[#d8d0c4] text-[#685f55] hover:border-[#c99036]"
+                      }`}
                     >
-                    {filter}
+                      {filter}
                     </button>
-                ))}
+                  ))}
                 </div>
+              )}
             </div>
           </div>
 
+          {/* LOADING */}
+          {loading && (
+            <div className="py-20 text-center text-[#71675c]">
+              Memuat koleksi...
+            </div>
+          )}
+
+          {/* ERROR */}
+          {!loading && errorMessage && (
+            <div className="border border-red-200 bg-red-50 px-5 py-4 text-red-600">
+              {errorMessage}
+            </div>
+          )}
+
+          {/* DATA KOSONG */}
+          {!loading &&
+            !errorMessage &&
+            filteredCollections.length === 0 && (
+              <div className="py-20 text-center text-[#71675c]">
+                Belum ada koleksi.
+              </div>
+            )}
+
           {/* GALLERY */}
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {filteredCollections.map((item) => (
-              <button
-                key={item.id}
-                onClick={() => setSelectedItem(item)}
-                className="group relative h-[360px] overflow-hidden text-left lg:h-[390px]"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+          {!loading && !errorMessage && (
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {filteredCollections.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setSelectedItem(item)}
+                  className="group relative h-[360px] overflow-hidden bg-[#ddd4c6] text-left lg:h-[390px]"
+                >
+                  {/* IMAGE */}
+                  {item.image_url ? (
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[#ddd4c6] text-sm text-[#71675c]">
+                      Belum ada gambar
+                    </div>
+                  )}
 
-                {/* DARK GRADIENT */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+                  {/* DARK GRADIENT */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
 
-                {/* TEXT */}
-                <div className="absolute bottom-0 left-0 right-0 p-7">
-                  <p className="mb-2 text-[11px] font-semibold tracking-[0.2em] text-[#d9a548]">
-                    {item.category}
-                  </p>
+                  {/* TEXT */}
+                  <div className="absolute bottom-0 left-0 right-0 p-7">
+                    <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d9a548]">
+                      {item.category}
+                    </p>
 
-                  <div className="flex items-end justify-between gap-5">
-                    <h3 className="font-serif text-[26px] text-white">
-                      {item.title}
-                    </h3>
+                    <div className="flex items-end justify-between gap-5">
+                      <h3 className="font-serif text-[26px] text-white">
+                        {item.title}
+                      </h3>
 
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/70 text-xl text-white transition group-hover:bg-white group-hover:text-black">
-                      +
-                    </span>
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/70 text-xl text-white transition group-hover:bg-white group-hover:text-black">
+                        +
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
-          </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* MODAL / POPUP */}
+      {/* ==========================================
+          MODAL / POPUP
+      ========================================== */}
       {selectedItem && (
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-5"
@@ -161,6 +219,7 @@ export default function Collection() {
         >
           {/* CLOSE */}
           <button
+            type="button"
             onClick={() => setSelectedItem(null)}
             className="absolute right-6 top-6 flex h-12 w-12 items-center justify-center bg-[#f4f0e8] text-2xl text-black transition hover:bg-[#c99036]"
           >
@@ -171,20 +230,32 @@ export default function Collection() {
             className="w-full max-w-[520px]"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={selectedItem.image}
-              alt={selectedItem.title}
-              className="max-h-[70vh] w-full object-cover"
-            />
+            {selectedItem.image_url ? (
+              <img
+                src={selectedItem.image_url}
+                alt={selectedItem.title}
+                className="max-h-[70vh] w-full object-cover"
+              />
+            ) : (
+              <div className="flex h-[400px] w-full items-center justify-center bg-[#ddd4c6] text-[#71675c]">
+                Belum ada gambar
+              </div>
+            )}
 
             <div className="bg-[#11100d] px-6 py-5">
-              <p className="mb-2 text-[10px] font-semibold tracking-[0.22em] text-[#c99036]">
+              <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#c99036]">
                 {selectedItem.category}
               </p>
 
               <h3 className="font-serif text-[24px] text-[#f4f0e8]">
                 {selectedItem.title}
               </h3>
+
+              {selectedItem.description && (
+                <p className="mt-3 text-sm leading-6 text-white/60">
+                  {selectedItem.description}
+                </p>
+              )}
             </div>
           </div>
         </div>

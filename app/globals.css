@@ -72,3 +72,25 @@ body {
 .nav-link:hover::after {
   width: 100%;
 }
+/* Scrollbar Cara Pesan */
+.order-steps-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(117, 101, 84, 0.15) transparent;
+}
+
+.order-steps-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+
+.order-steps-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.order-steps-scroll::-webkit-scrollbar-thumb {
+  background: rgba(117, 101, 84, 0.15);
+  border-radius: 999px;
+}
+
+.order-steps-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(201, 139, 40, 0.35);
+}
