@@ -6,19 +6,41 @@ export const dynamic = "force-dynamic";
 export default async function CTASection() {
   const supabase = await createClient();
 
-  const { data: cta, error: ctaError } = await supabase
-    .from("cta_section")
-    .select(
-      "badge, title, title_highlight, description, button_text, background_url"
-    )
-    .eq("id", 1)
-    .maybeSingle();
+  // Ambil data CTA dan pengaturan website sekaligus
+  const [
+    { data: cta, error: ctaError },
+    { data: settings, error: settingsError },
+  ] = await Promise.all([
+    supabase
+      .from("cta_section")
+      .select(
+        "badge, title, title_highlight, description, button_text, background_url"
+      )
+      .eq("id", 1)
+      .maybeSingle(),
+
+    supabase
+      .from("site_settings")
+      .select("whatsapp_number")
+      .eq("id", 1)
+      .maybeSingle(),
+  ]);
 
   if (ctaError) {
     console.error("Gagal mengambil CTA:", ctaError.message);
   }
 
-  const whatsappNumber = "6285701111308";
+  if (settingsError) {
+    console.error(
+      "Gagal mengambil nomor WhatsApp:",
+      settingsError.message
+    );
+  }
+
+  // Nomor WhatsApp dari Pengaturan Website
+  // Nomor lama digunakan sebagai fallback jika data kosong
+  const whatsappNumber =
+    settings?.whatsapp_number || "6285701111308";
 
   const message =
     "Halo TailorJogja.com, saya ingin konsultasi pembuatan pakaian.";
@@ -27,7 +49,8 @@ export default async function CTASection() {
     message
   )}`;
 
-  const badge = cta?.badge || "Your Perfect Fit Awaits";
+  const badge =
+    cta?.badge || "Your Perfect Fit Awaits";
 
   const title =
     cta?.title || "Saatnya Memiliki Pakaian yang Benar-Benar";

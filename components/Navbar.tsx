@@ -1,10 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Nomor default sebagai fallback
+  const [whatsappNumber, setWhatsappNumber] =
+    useState("6285701111308");
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,6 +20,33 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
 
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Ambil nomor WhatsApp dari Supabase
+  useEffect(() => {
+    const getSettings = async () => {
+      const supabase = createClient();
+
+      const { data, error } = await supabase
+        .from("site_settings")
+        .select("whatsapp_number")
+        .eq("id", 1)
+        .maybeSingle();
+
+      if (error) {
+        console.error(
+          "Gagal mengambil nomor WhatsApp:",
+          error.message
+        );
+        return;
+      }
+
+      if (data?.whatsapp_number) {
+        setWhatsappNumber(data.whatsapp_number);
+      }
+    };
+
+    getSettings();
   }, []);
 
   const menuItems = [
@@ -28,8 +60,10 @@ export default function Navbar() {
     { label: "KONTAK", href: "#kontak" },
   ];
 
-  const whatsappUrl =
-    "https://wa.me/6285701111308?text=Halo%20TailorJogja.com,%20saya%20ingin%20konsultasi.";
+  // URL WhatsApp sekarang dinamis
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    "Halo TailorJogja.com, saya ingin konsultasi."
+  )}`;
 
   return (
     <header
@@ -69,7 +103,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* CTA */}
+        {/* CTA DESKTOP */}
         <a
           href={whatsappUrl}
           target="_blank"

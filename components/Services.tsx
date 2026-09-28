@@ -1,5 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 type Service = {
   id: number;
   title: string;
@@ -12,6 +14,9 @@ type Service = {
 export default async function Services() {
   const supabase = await createClient();
 
+  // =========================
+  // AMBIL DATA LAYANAN
+  // =========================
   const { data, error } = await supabase
     .from("services")
     .select(`
@@ -26,10 +31,30 @@ export default async function Services() {
     .order("id", { ascending: true });
 
   if (error) {
-    console.error("Gagal mengambil layanan:", error);
+    console.error("Gagal mengambil layanan:", error.message);
+  }
+
+  // =========================
+  // AMBIL PENGATURAN WEBSITE
+  // =========================
+  const { data: settings, error: settingsError } = await supabase
+    .from("site_settings")
+    .select("whatsapp_number")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (settingsError) {
+    console.error(
+      "Gagal mengambil pengaturan website:",
+      settingsError.message
+    );
   }
 
   const services: Service[] = data || [];
+
+  // Nomor WhatsApp dinamis
+  const whatsappNumber =
+    settings?.whatsapp_number || "6285701111308";
 
   return (
     <section
@@ -73,11 +98,14 @@ export default async function Services() {
             const buttonText =
               service.button_text || "KONSULTASIKAN";
 
+            // Pesan WhatsApp berbeda sesuai layanan
+            const whatsappMessage =
+              `Halo TailorJogja.com, saya ingin konsultasi mengenai ${service.title}.`;
+
             const whatsappUrl =
-              "https://wa.me/6285701111308?text=" +
-              encodeURIComponent(
-                `Halo TailorJogja.com, saya ingin konsultasi mengenai ${service.title}.`
-              );
+              `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+                whatsappMessage
+              )}`;
 
             return (
               <article

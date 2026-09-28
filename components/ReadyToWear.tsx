@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 
-const whatsappNumber = "6285701111308";
+export const dynamic = "force-dynamic";
 
 type ReadyToWearItem = {
   id: number;
@@ -17,6 +17,9 @@ type ReadyToWearItem = {
 export default async function ReadyToWear() {
   const supabase = await createClient();
 
+  // =========================
+  // AMBIL PRODUK READY TO WEAR
+  // =========================
   const { data, error } = await supabase
     .from("ready_to_wear")
     .select(
@@ -25,10 +28,34 @@ export default async function ReadyToWear() {
     .order("sort_order", { ascending: true })
     .order("id", { ascending: true });
 
+  // =========================
+  // AMBIL NOMOR WHATSAPP
+  // =========================
+  const { data: settings, error: settingsError } = await supabase
+    .from("site_settings")
+    .select("whatsapp_number")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (settingsError) {
+    console.error(
+      "Gagal mengambil pengaturan website:",
+      settingsError.message
+    );
+  }
+
   const products = (data || []) as ReadyToWearItem[];
 
+  // Nomor WA dari Pengaturan Website
+  const whatsappNumber =
+    settings?.whatsapp_number || "6285701111308";
+
+  // =========================
+  // BUAT URL WHATSAPP
+  // =========================
   const createWhatsAppUrl = (productName: string) => {
-    const message = `Halo TailorJogja.com, saya ingin bertanya mengenai produk ${productName}.`;
+    const message =
+      `Halo TailorJogja.com, saya ingin bertanya mengenai produk ${productName}.`;
 
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
       message
@@ -89,7 +116,7 @@ export default async function ReadyToWear() {
                 {products.map((product) => (
                   <article
                     key={product.id}
-                    className="flex overflow-hidden border border-[#d8cebf] bg-[#f8f4ed] flex-col"
+                    className="flex flex-col overflow-hidden border border-[#d8cebf] bg-[#f8f4ed]"
                   >
                     {/* IMAGE */}
                     <div className="h-[380px] overflow-hidden lg:h-[390px]">

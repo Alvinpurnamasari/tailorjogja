@@ -1,9 +1,12 @@
 import { createClient } from "@/utils/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function Hero() {
   const supabase = await createClient();
 
-  const { data: hero } = await supabase
+  // Ambil data Hero
+  const { data: hero, error: heroError } = await supabase
     .from("hero_section")
     .select(
       "badge, title, title_highlight, description, button_text, background_url"
@@ -11,7 +14,31 @@ export default async function Hero() {
     .eq("id", 1)
     .maybeSingle();
 
-  // Fallback jika data Supabase belum tersedia
+  // Ambil nomor WhatsApp dari Pengaturan Website
+  const { data: settings, error: settingsError } = await supabase
+    .from("site_settings")
+    .select("whatsapp_number")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (heroError) {
+    console.error(
+      "Gagal mengambil Hero:",
+      heroError.message
+    );
+  }
+
+  if (settingsError) {
+    console.error(
+      "Gagal mengambil pengaturan website:",
+      settingsError.message
+    );
+  }
+
+  // =========================
+  // HERO DATA
+  // =========================
+
   const badge =
     hero?.badge || "PROFESSIONAL TAILOR • YOGYAKARTA";
 
@@ -30,6 +57,20 @@ export default async function Hero() {
 
   const backgroundUrl =
     hero?.background_url || "/images/jas1.jpg";
+
+  // =========================
+  // WHATSAPP
+  // =========================
+
+  const whatsappNumber =
+    settings?.whatsapp_number || "6285701111308";
+
+  const whatsappMessage =
+    "Halo TailorJogja.com, saya ingin konsultasi mengenai pembuatan pakaian custom.";
+
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    whatsappMessage
+  )}`;
 
   return (
     <section
@@ -84,8 +125,10 @@ export default async function Hero() {
 
           {/* BUTTON */}
           <div className="mt-9 flex flex-wrap gap-4">
+
+            {/* WHATSAPP */}
             <a
-              href="https://wa.me/6285701111308"
+              href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#d6a24e] px-8 py-5 text-xs font-bold tracking-[0.1em] text-black transition duration-300 hover:bg-[#e5b45e]"
@@ -93,6 +136,7 @@ export default async function Hero() {
               ◯ &nbsp; {buttonText}
             </a>
 
+            {/* LIHAT LAYANAN */}
             <a
               href="#layanan"
               className="border border-white/50 bg-black/20 px-8 py-5 text-xs font-bold tracking-[0.1em] text-white backdrop-blur-[2px] transition duration-300 hover:bg-white hover:text-black"
@@ -105,7 +149,9 @@ export default async function Hero() {
           <div className="mt-12 flex flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/20 pt-7">
 
             <p className="text-xs tracking-[0.17em] text-white/80">
-              <span className="mr-2 text-[#d6a24e]">✓</span>
+              <span className="mr-2 text-[#d6a24e]">
+                ✓
+              </span>
               DIUKUR LANGSUNG
             </p>
 
@@ -114,7 +160,9 @@ export default async function Hero() {
             </span>
 
             <p className="text-xs tracking-[0.17em] text-white/80">
-              <span className="mr-2 text-[#d6a24e]">✓</span>
+              <span className="mr-2 text-[#d6a24e]">
+                ✓
+              </span>
               CUSTOM SESUAI UKURAN
             </p>
 
@@ -123,7 +171,9 @@ export default async function Hero() {
             </span>
 
             <p className="text-xs tracking-[0.17em] text-white/80">
-              <span className="mr-2 text-[#d6a24e]">✓</span>
+              <span className="mr-2 text-[#d6a24e]">
+                ✓
+              </span>
               JAHITAN BERKUALITAS
             </p>
 

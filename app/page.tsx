@@ -9,22 +9,28 @@ import HowToOrder from "@/components/HowToOrder";
 import CTASection from "@/components/CTASection";
 import Faq from "@/components/FAQ";
 import Footer from "@/components/Footer";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 
 export default function Home() {
   return (
-    <main>
+    <>
       <Navbar />
-      <Hero />
-      <Services />
-      <About />
-      <Advantages/>
-      <Collection/>
-      <ReadyToWear/>
-      <HowToOrder/>
-      <CTASection/>
-      <Faq/>
-      <Footer/>
 
-    </main>
+      <main>
+        <Hero />
+        <About />
+        <Services />
+        <Advantages />
+        <Collection/>
+        <ReadyToWear />
+        <HowToOrder />
+        <Faq/>
+        <CTASection />
+      </main>
+
+      <Footer />
+
+      <FloatingWhatsApp />
+    </>
   );
 }

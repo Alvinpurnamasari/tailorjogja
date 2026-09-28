@@ -1,19 +1,47 @@
 import { createClient } from "@/utils/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function About() {
   const supabase = await createClient();
 
-  const { data: about } = await supabase
+  // =========================
+  // AMBIL DATA ABOUT
+  // =========================
+  const { data: about, error: aboutError } = await supabase
     .from("about_section")
     .select("*")
     .eq("id", 1)
     .maybeSingle();
 
-  const whatsappUrl =
-    "https://wa.me/6285701111308?text=" +
-    encodeURIComponent(
-      "Halo TailorJogja.com, saya ingin konsultasi mengenai pembuatan pakaian custom."
+  if (aboutError) {
+    console.error("Gagal mengambil data Tentang:", aboutError.message);
+  }
+
+  // =========================
+  // AMBIL PENGATURAN WEBSITE
+  // =========================
+  const { data: settings, error: settingsError } = await supabase
+    .from("site_settings")
+    .select("whatsapp_number")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (settingsError) {
+    console.error(
+      "Gagal mengambil pengaturan website:",
+      settingsError.message
     );
+  }
+
+  // Nomor WhatsApp dari Pengaturan Website
+  const whatsappNumber =
+    settings?.whatsapp_number || "6285701111308";
+
+  const whatsappUrl =
+    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+      "Halo TailorJogja.com, saya ingin konsultasi mengenai pembuatan pakaian custom."
+    )}`;
 
   // Fallback jika data Supabase belum tersedia
   const sectionLabel = about?.section_label || "ABOUT US";
