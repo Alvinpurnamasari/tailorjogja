@@ -17,7 +17,8 @@ export default async function SettingsPage() {
       facebook_url,
       tiktok_url,
       email,
-      address
+      address,
+      logo_url
       `
     )
     .eq("id", 1)
@@ -52,7 +53,7 @@ export default async function SettingsPage() {
         </h1>
 
         <p className="mt-2 text-[15px] text-[#756554]">
-          Kelola informasi kontak dan media sosial TailorJogja.
+          Kelola informasi kontak, media sosial, dan logo TailorJogja.
         </p>
       </div>
 
