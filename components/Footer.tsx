@@ -1,9 +1,13 @@
 import {
-  Camera,
-  Globe,
   Mail,
   MapPin,
 } from "lucide-react";
+
+import {
+  FaInstagram,
+  FaFacebookF,
+  FaTiktok,
+} from "react-icons/fa";
 
 import { createClient } from "@/utils/supabase/server";
 
@@ -294,12 +298,9 @@ export default async function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
-                  className="flex h-10 w-10 items-center justify-center border border-white/15 transition hover:border-[#d6a247] hover:text-[#d6a247]"
+                  className="flex h-10 w-10 items-center justify-center border border-white/15 text-white transition hover:border-[#d6a247] hover:text-[#d6a247]"
                 >
-                  <Camera
-                    size={17}
-                    strokeWidth={1.5}
-                  />
+                  <FaInstagram size={18} />
                 </a>
               )}
 
@@ -310,12 +311,9 @@ export default async function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Facebook"
-                  className="flex h-10 w-10 items-center justify-center border border-white/15 transition hover:border-[#d6a247] hover:text-[#d6a247]"
+                  className="flex h-10 w-10 items-center justify-center border border-white/15 text-white transition hover:border-[#d6a247] hover:text-[#d6a247]"
                 >
-                  <Globe
-                    size={17}
-                    strokeWidth={1.5}
-                  />
+                  <FaFacebookF size={17} />
                 </a>
               )}
 
@@ -326,9 +324,9 @@ export default async function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="TikTok"
-                  className="flex h-10 w-10 items-center justify-center border border-white/15 text-[12px] font-semibold transition hover:border-[#d6a247] hover:text-[#d6a247]"
+                  className="flex h-10 w-10 items-center justify-center border border-white/15 text-white transition hover:border-[#d6a247] hover:text-[#d6a247]"
                 >
-                  TT
+                  <FaTiktok size={17} />
                 </a>
               )}
 
