@@ -7,48 +7,66 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // Nomor default sebagai fallback
+  // Data dari site_settings
   const [whatsappNumber, setWhatsappNumber] =
     useState("6285701111308");
 
+  const [logoUrl, setLogoUrl] = useState("");
+
+  // ==========================================
+  // SCROLL NAVBAR
+  // ==========================================
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 80);
     };
 
     handleScroll();
+
     window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  // Ambil nomor WhatsApp dari Supabase
+  // ==========================================
+  // AMBIL SETTINGS DARI SUPABASE
+  // ==========================================
   useEffect(() => {
     const getSettings = async () => {
       const supabase = createClient();
 
       const { data, error } = await supabase
         .from("site_settings")
-        .select("whatsapp_number")
+        .select("whatsapp_number, logo_url")
         .eq("id", 1)
         .maybeSingle();
 
       if (error) {
         console.error(
-          "Gagal mengambil nomor WhatsApp:",
+          "Gagal mengambil pengaturan website:",
           error.message
         );
+
         return;
       }
 
       if (data?.whatsapp_number) {
         setWhatsappNumber(data.whatsapp_number);
       }
+
+      if (data?.logo_url) {
+        setLogoUrl(data.logo_url);
+      }
     };
 
     getSettings();
   }, []);
 
+  // ==========================================
+  // MENU
+  // ==========================================
   const menuItems = [
     { label: "BERANDA", href: "#beranda" },
     { label: "LAYANAN", href: "#layanan" },
@@ -60,7 +78,9 @@ export default function Navbar() {
     { label: "KONTAK", href: "#kontak" },
   ];
 
-  // URL WhatsApp sekarang dinamis
+  // ==========================================
+  // WHATSAPP
+  // ==========================================
   const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Halo TailorJogja.com, saya ingin konsultasi."
   )}`;
@@ -74,19 +94,41 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto flex h-[92px] max-w-[1480px] items-center justify-between px-6 md:px-10 lg:px-16">
-        
-        {/* LOGO */}
+
+        {/* =====================================
+            LOGO
+        ===================================== */}
         <a
           href="#beranda"
-          className={`font-serif text-[21px] transition-colors duration-500 ${
-            scrolled ? "text-[#17130f]" : "text-white"
-          }`}
+          className="flex shrink-0 items-center"
         >
-          Tailor<span className="text-[#d29a3a]">Jogja</span>
-          <span className="text-[11px]">.com</span>
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="TailorJogja"
+              className="h-[48px] w-auto max-w-[190px] object-contain"
+            />
+          ) : (
+            <div
+              className={`font-serif text-[21px] transition-colors duration-500 ${
+                scrolled ? "text-[#17130f]" : "text-white"
+              }`}
+            >
+              Tailor
+              <span className="text-[#d29a3a]">
+                Jogja
+              </span>
+
+              <span className="text-[11px]">
+                .com
+              </span>
+            </div>
+          )}
         </a>
 
-        {/* DESKTOP MENU */}
+        {/* =====================================
+            DESKTOP MENU
+        ===================================== */}
         <nav className="hidden items-center gap-8 lg:flex">
           {menuItems.map((item) => (
             <a
@@ -103,7 +145,9 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* CTA DESKTOP */}
+        {/* =====================================
+            CTA DESKTOP
+        ===================================== */}
         <a
           href={whatsappUrl}
           target="_blank"
@@ -111,10 +155,15 @@ export default function Navbar() {
           className="hidden bg-[#d9a348] px-8 py-[18px] text-[11px] font-bold tracking-[0.12em] text-black transition hover:bg-[#e6b45c] lg:flex lg:items-center lg:gap-5"
         >
           KONSULTASI SEKARANG
-          <span className="text-lg leading-none">↗</span>
+
+          <span className="text-lg leading-none">
+            ↗
+          </span>
         </a>
 
-        {/* MOBILE BUTTON */}
+        {/* =====================================
+            MOBILE BUTTON
+        ===================================== */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
           className={`text-2xl lg:hidden ${
@@ -126,10 +175,13 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* MOBILE MENU */}
+      {/* =====================================
+          MOBILE MENU
+      ===================================== */}
       {menuOpen && (
         <div className="border-t border-black/10 bg-[#f5f1e8] px-6 py-6 lg:hidden">
           <nav className="flex flex-col gap-5">
+
             {menuItems.map((item) => (
               <a
                 key={item.label}
@@ -149,6 +201,7 @@ export default function Navbar() {
             >
               KONSULTASI SEKARANG ↗
             </a>
+
           </nav>
         </div>
       )}

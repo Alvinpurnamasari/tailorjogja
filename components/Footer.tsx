@@ -27,7 +27,8 @@ export default async function Footer() {
       facebook_url,
       tiktok_url,
       email,
-      address
+      address,
+      logo_url
     `)
     .eq("id", 1)
     .maybeSingle();
@@ -59,6 +60,9 @@ export default async function Footer() {
 
   const address =
     settings?.address || "";
+
+  const logoUrl =
+    settings?.logo_url || "";
 
   // =========================
   // FORMAT NOMOR WHATSAPP
@@ -118,18 +122,30 @@ export default async function Footer() {
 
           {/* ================= BRAND ================= */}
           <div>
+
+            {/* LOGO WEBSITE */}
             <a
               href="#beranda"
-              className="inline-block font-serif text-[20px] text-white"
+              className="inline-flex items-center"
             >
-              Tailor
-              <span className="text-[#d6a247]">
-                Jogja
-              </span>
+              {logoUrl ? (
+                <img
+                  src={logoUrl}
+                  alt="TailorJogja"
+                  className="h-[55px] w-auto max-w-[220px] object-contain"
+                />
+              ) : (
+                <div className="font-serif text-[20px] text-white">
+                  Tailor
+                  <span className="text-[#d6a247]">
+                    Jogja
+                  </span>
 
-              <span className="text-[11px] text-[#c8c0b5]">
-                .com
-              </span>
+                  <span className="text-[11px] text-[#c8c0b5]">
+                    .com
+                  </span>
+                </div>
+              )}
             </a>
 
             <p className="mt-7 max-w-[430px] text-[14px] leading-7 text-[#d4ccc2]">
