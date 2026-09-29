@@ -10,12 +10,31 @@ export default async function About() {
   // =========================
   const { data: about, error: aboutError } = await supabase
     .from("about_section")
-    .select("*")
+    .select(`
+      id,
+      section_label,
+      title,
+      title_highlight,
+      description,
+      image_url,
+      image_number,
+      image_label,
+      checklist_1,
+      checklist_2,
+      checklist_3,
+      checklist_4,
+      checklist_5,
+      checklist_6,
+      button_text
+    `)
     .eq("id", 1)
     .maybeSingle();
 
   if (aboutError) {
-    console.error("Gagal mengambil data Tentang:", aboutError.message);
+    console.error(
+      "Gagal mengambil data Tentang:",
+      aboutError.message
+    );
   }
 
   // =========================
@@ -34,17 +53,21 @@ export default async function About() {
     );
   }
 
-  // Nomor WhatsApp dari Pengaturan Website
+  // =========================
+  // WHATSAPP
+  // =========================
   const whatsappNumber =
     settings?.whatsapp_number || "6285701111308";
 
-  const whatsappUrl =
-    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-      "Halo TailorJogja.com, saya ingin konsultasi mengenai pembuatan pakaian custom."
-    )}`;
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+    "Halo TailorJogja.com, saya ingin konsultasi mengenai pembuatan pakaian custom."
+  )}`;
 
-  // Fallback jika data Supabase belum tersedia
-  const sectionLabel = about?.section_label || "ABOUT US";
+  // =========================
+  // FALLBACK DATA
+  // =========================
+  const sectionLabel =
+    about?.section_label || "ABOUT US";
 
   const title =
     about?.title || "Karena Pakaian yang Pas Dimulai dari";
@@ -59,8 +82,42 @@ export default async function About() {
   const imageUrl =
     about?.image_url || "/images/jas.jpg";
 
+  const imageNumber =
+    about?.image_number || "01";
+
+  const imageLabel =
+    about?.image_label || "PERSONAL MEASUREMENT";
+
   const buttonText =
     about?.button_text || "KONSULTASIKAN KEBUTUHAN ANDA";
+
+  // =========================
+  // CHECKLIST
+  // =========================
+  const checklists = [
+    about?.checklist_1,
+    about?.checklist_2,
+    about?.checklist_3,
+    about?.checklist_4,
+    about?.checklist_5,
+    about?.checklist_6,
+  ].filter(
+    (item): item is string =>
+      typeof item === "string" && item.trim() !== ""
+  );
+
+  // Fallback checklist
+  const fallbackChecklists = [
+    "Pengukuran langsung oleh penjahit",
+    "Ukuran disesuaikan dengan tubuh pelanggan",
+    "Pilihan model sesuai kebutuhan",
+    "Pilihan bahan dan warna",
+    "Detail jahitan yang diperhatikan",
+    "Konsultasi sebelum pengerjaan",
+  ];
+
+  const displayedChecklists =
+    checklists.length > 0 ? checklists : fallbackChecklists;
 
   return (
     <section id="tentang" className="bg-[#f8f4ec]">
@@ -76,13 +133,14 @@ export default async function About() {
 
           <div className="absolute inset-0 bg-black/10" />
 
+          {/* IMAGE LABEL */}
           <div className="absolute bottom-0 right-0 bg-[#0d0b08] px-12 py-8 text-white lg:px-16">
             <p className="font-serif text-[25px] text-[#d5a04a]">
-              01
+              {imageNumber}
             </p>
 
             <p className="mt-2 text-[11px] tracking-[0.18em] text-white/80">
-              PERSONAL MEASUREMENT
+              {imageLabel}
             </p>
           </div>
         </div>
@@ -115,12 +173,12 @@ export default async function About() {
 
             {/* CHECKLIST */}
             <div className="mt-9 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-              <CheckItem text="Pengukuran langsung oleh penjahit" />
-              <CheckItem text="Ukuran disesuaikan dengan tubuh pelanggan" />
-              <CheckItem text="Pilihan model sesuai kebutuhan" />
-              <CheckItem text="Pilihan bahan dan warna" />
-              <CheckItem text="Detail jahitan yang diperhatikan" />
-              <CheckItem text="Konsultasi sebelum pengerjaan" />
+              {displayedChecklists.map((item, index) => (
+                <CheckItem
+                  key={`${item}-${index}`}
+                  text={item}
+                />
+              ))}
             </div>
 
             {/* BUTTON */}
@@ -139,7 +197,6 @@ export default async function About() {
 
           </div>
         </div>
-
       </div>
     </section>
   );
